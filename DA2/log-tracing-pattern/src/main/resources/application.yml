@@ -1,0 +1,8 @@
+server:
+  port: 9009
+spring:
+  application:
+    name: tracing-demo
+spring.sleuth:
+  sampler:
+    probability: 1.0

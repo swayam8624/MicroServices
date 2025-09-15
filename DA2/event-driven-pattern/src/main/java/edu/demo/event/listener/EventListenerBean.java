@@ -1,0 +1,1 @@
+package edu.demo.event.listener; import edu.demo.event.controller.SimplePayloadEvent; import org.springframework.context.event.EventListener; import org.springframework.stereotype.Component; @Component public class EventListenerBean { @EventListener public void on(SimplePayloadEvent ev){ System.out.println("Received event: " + ev.getPayload()); } }

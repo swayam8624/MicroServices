@@ -1,0 +1,13 @@
+server:
+  port: 9006
+spring:
+  application:
+    name: cqrs
+  datasource:
+    url: jdbc:h2:mem:cqrsdb;DB_CLOSE_DELAY=-1
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update

@@ -1,0 +1,15 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: api-gateway
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: demo-httpbin
+          uri: https://httpbin.org
+          predicates:
+            - Path=/httpbin/**
+          filters:
+            - RewritePath=/httpbin/(?<remaining>.*), /${remaining}

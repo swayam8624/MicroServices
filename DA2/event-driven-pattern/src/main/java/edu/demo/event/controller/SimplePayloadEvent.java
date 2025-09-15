@@ -1,0 +1,1 @@
+package edu.demo.event.controller; import java.util.Map; public class SimplePayloadEvent { private final Object source; private final Map<String,Object> payload; public SimplePayloadEvent(Object s, Map<String,Object> p){this.source=s;this.payload=p;} public Map<String,Object> getPayload(){return payload;} }
