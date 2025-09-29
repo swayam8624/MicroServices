@@ -1,0 +1,29 @@
+services:
+  product-service:
+    build: ./product-service
+    ports:
+      - "9081:8081"
+    networks:
+      - retail-network
+
+  order-service:
+    build: ./order-service
+    ports:
+      - "9082:8082"
+    networks:
+      - retail-network
+    depends_on:
+      - product-service
+
+  payment-service:
+    build: ./payment-service
+    ports:
+      - "9083:8083"
+    networks:
+      - retail-network
+    depends_on:
+      - order-service
+
+networks:
+  retail-network:
+    driver: bridge

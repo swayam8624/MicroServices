@@ -1,0 +1,276 @@
+# Microservices Testing Results
+
+## 1. Product Service Testing
+
+### Request:
+curl -X GET http://localhost:9081/api/products
+
+### Response:
+[
+  {
+    "id": 1,
+    "name": "Laptop",
+    "description": "High-performance laptop",
+    "price": 1200.0,
+    "quantity": 10
+  },
+  {
+    "id": 2,
+    "name": "Smartphone",
+    "description": "Latest smartphone model",
+    "price": 800.0,
+    "quantity": 25
+  },
+  {
+    "id": 3,
+    "name": "Headphones",
+    "description": "Noise-cancelling headphones",
+    "price": 200.0,
+    "quantity": 50
+  }
+]
+
+## 2. Order Service Testing
+
+### Request:
+curl -X POST http://localhost:9082/api/orders -H "Content-Type: application/json" -d '{"customerId": 1, "items": [{"productId": 1, "quantity": 2}]}'
+
+### Response:
+{
+  "id": 1,
+  "customerId": 1,
+  "items": [
+    {
+      "productId": 1,
+      "productName": "Laptop",
+      "quantity": 2,
+      "price": 1200.0
+    }
+  ],
+  "totalAmount": 2400.0,
+  "status": "CREATED"
+}
+
+### Verification Request:
+curl -X GET http://localhost:9082/api/orders
+
+### Verification Response:
+[
+  {
+    "id": 1,
+    "customerId": 1,
+    "items": [
+      {
+        "productId": 1,
+        "productName": "Laptop",
+        "quantity": 2,
+        "price": 1200.0
+      }
+    ],
+    "totalAmount": 2400.0,
+    "status": "CREATED"
+  }
+]
+
+## 3. Payment Service Testing
+
+### Request:
+curl -X POST http://localhost:9083/api/payments -H "Content-Type: application/json" -d '{"orderId": 1, "paymentMethod": "CREDIT_CARD"}'
+
+### Response:
+{
+  "id": null,
+  "orderId": 1,
+  "amount": 2400.0,
+  "status": "COMPLETED",
+  "paymentMethod": "CREDIT_CARD"
+}
+
+### Verification Request:
+curl -X GET http://localhost:9083/api/payments
+
+### Verification Response:
+[
+  {
+    "id": null,
+    "orderId": 1,
+    "amount": 2400.0,
+    "status": "COMPLETED",
+    "paymentMethod": "CREDIT_CARD"
+  }
+]
+
+## 4. Complete Workflow Test
+
+### 4.1 Create a New Product
+
+#### Request:
+curl -X POST http://localhost:9081/api/products -H "Content-Type: application/json" -d '{"name": "Tablet", "description": "10-inch tablet", "price": 500.0, "quantity": 15}'
+
+#### Response:
+{
+  "id": 4,
+  "name": "Tablet",
+  "description": "10-inch tablet",
+  "price": 500.0,
+  "quantity": 15
+}
+
+### 4.2 Create an Order for the New Product
+
+#### Request:
+curl -X POST http://localhost:9082/api/orders -H "Content-Type: application/json" -d '{"customerId": 2, "items": [{"productId": 4, "quantity": 1}]}'
+
+#### Response:
+{
+  "id": 2,
+  "customerId": 2,
+  "items": [
+    {
+      "productId": 4,
+      "productName": "Tablet",
+      "quantity": 1,
+      "price": 500.0
+    }
+  ],
+  "totalAmount": 500.0,
+  "status": "CREATED"
+}
+
+### 4.3 Process Payment for the Order
+
+#### Request:
+curl -X POST http://localhost:9083/api/payments -H "Content-Type: application/json" -d '{"orderId": 2, "paymentMethod": "DEBIT_CARD"}'
+
+#### Response:
+{
+  "id": null,
+  "orderId": 2,
+  "amount": 500.0,
+  "status": "COMPLETED",
+  "paymentMethod": "DEBIT_CARD"
+}
+
+## 5. Final System Verification
+
+### Command:
+echo "=== FINAL SYSTEM VERIFICATION ===" && echo "1. Checking all products:" && curl -s http://localhost:9081/api/products | jq '.' && echo "2. Checking all orders:" && curl -s http://localhost:9082/api/orders | jq '.' && echo "3. Checking all payments:" && curl -s http://localhost:9083/api/payments | jq '.'
+
+### Output:
+```
+=== FINAL SYSTEM VERIFICATION ===
+1. Checking all products:
+[
+  {
+    "id": 1,
+    "name": "Laptop",
+    "description": "High-performance laptop",
+    "price": 1200.0,
+    "quantity": 10
+  },
+  {
+    "id": 2,
+    "name": "Smartphone",
+    "description": "Latest smartphone model",
+    "price": 800.0,
+    "quantity": 25
+  },
+  {
+    "id": 3,
+    "name": "Headphones",
+    "description": "Noise-cancelling headphones",
+    "price": 200.0,
+    "quantity": 50
+  },
+  {
+    "id": 4,
+    "name": "Tablet",
+    "description": "10-inch tablet",
+    "price": 500.0,
+    "quantity": 15
+  }
+]
+2. Checking all orders:
+[
+  {
+    "id": 1,
+    "customerId": 1,
+    "items": [
+      {
+        "productId": 1,
+        "productName": "Laptop",
+        "quantity": 2,
+        "price": 1200.0
+      }
+    ],
+    "totalAmount": 2400.0,
+    "status": "CREATED"
+  },
+  {
+    "id": 2,
+    "customerId": 2,
+    "items": [
+      {
+        "productId": 4,
+        "productName": "Tablet",
+        "quantity": 1,
+        "price": 500.0
+      }
+    ],
+    "totalAmount": 500.0,
+    "status": "CREATED"
+  }
+]
+3. Checking all payments:
+[
+  {
+    "id": null,
+    "orderId": 1,
+    "amount": 2400.0,
+    "status": "COMPLETED",
+    "paymentMethod": "CREDIT_CARD"
+  },
+  {
+    "id": null,
+    "orderId": 2,
+    "amount": 500.0,
+    "status": "COMPLETED",
+    "paymentMethod": "DEBIT_CARD"
+  }
+]
+```
+
+## Docker Container Status
+
+### Command:
+docker-compose ps
+
+### Output:
+```
+NAME                    IMAGE                 COMMAND               SERVICE           CREATED         STATUS         PORTS
+da3-order-service-1     da3-order-service     "java -jar app.jar"   order-service     2 minutes ago   Up 2 minutes   0.0.0.0:9082->8082/tcp, [::]:9082->8082/tcp
+da3-payment-service-1   da3-payment-service   "java -jar app.jar"   payment-service   2 minutes ago   Up 2 minutes   0.0.0.0:9083->8083/tcp, [::]:9083->8083/tcp
+da3-product-service-1   da3-product-service   "java -jar app.jar"   product-service   2 minutes ago   Up 2 minutes   0.0.0.0:9081->8081/tcp, [::]:9081->8081/tcp
+```
+
+## Docker Network Status
+
+### Command:
+docker network ls | grep da3
+
+### Output:
+```
+88a84db4325c   da3_retail-network   bridge    local
+```
+
+## Docker Images
+
+### Command:
+docker images | grep da3
+
+### Output:
+```
+da3-order-service      latest    d86ebd7a5579   2 minutes ago   339MB
+da3-payment-service    latest    700a4dd235c3   2 minutes ago   339MB
+da3-product-service    latest    1006ee4f83d0   6 minutes ago   339MB
+```
