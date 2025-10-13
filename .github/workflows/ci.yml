@@ -1,0 +1,65 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    paths:
+      - 'user-service/**'
+      - 'order-service/**'
+      - '.github/workflows/ci.yml'
+
+jobs:
+  build-user-service:
+    if: contains(github.event.head_commit.modified, 'user-service/') || contains(github.event.head_commit.added, 'user-service/') || contains(github.event.head_commit.removed, 'user-service/')
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Build and Test User Service
+      working-directory: ./user-service
+      run: |
+        mvn clean package
+        
+    - name: Build and Push Docker Image
+      if: github.ref == 'refs/heads/main'
+      run: |
+        echo "Docker build and push would happen here"
+        # In a real scenario, you would build and push to a container registry
+        # docker build -t user-service:latest ./user-service
+        # docker tag user-service:latest your-registry/user-service:${{ github.sha }}
+        # echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+        # docker push your-registry/user-service:${{ github.sha }}
+        # docker push your-registry/user-service:latest
+
+  build-order-service:
+    if: contains(github.event.head_commit.modified, 'order-service/') || contains(github.event.head_commit.added, 'order-service/') || contains(github.event.head_commit.removed, 'order-service/')
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Build and Test Order Service
+      working-directory: ./order-service
+      run: |
+        mvn clean package
+        
+    - name: Build and Push Docker Image
+      if: github.ref == 'refs/heads/main'
+      run: |
+        echo "Docker build and push would happen here"
+        # In a real scenario, you would build and push to a container registry
+        # docker build -t order-service:latest ./order-service
+        # docker tag order-service:latest your-registry/order-service:${{ github.sha }}
+        # echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+        # docker push your-registry/order-service:${{ github.sha }}
+        # docker push your-registry/order-service:latest
